@@ -29,3 +29,17 @@ fileignoreconfig:
   checksum: aa6e19dae19f0f9dec93ae320d20129510f8bb888eebe91a7d53d3543ad1aebe
 - filename: AWS/Autoscale_via_lb/2nic/README.md
   checksum: dd5a0e8d463722a8a960aad23c57ad25a41628e08a30d33e943545804792dc4e
+- filename: GCP/HA_via_api/5nic/as3.json
+  checksum: b97ac6b62e88e358f62facab84116c5b7e2a7f77b00f725348a6ab0224ea163f
+- filename: GCP/HA_via_api/5nic/ts.json
+  checksum: c170c6a78fc3b3a67feed9bd2747e99fb993b775f4e467c5e5f9a8476a50df32
+- filename: GCP/HA_via_api/5nic/terraform.tfvars.example
+  checksum: e39b3421eb66ff42e00092c54250a89d5ae34d8d2d71d1b25670e2b39fca8262
+- filename: GCP/HA_via_api/5nic/do.json
+  checksum: dad7a69fc8a51ee642ac709c6b5ad24eab2916be983fb85c505a7eec92d2508c
+- filename: GCP/HA_via_api/5nic/bigip.tf
+  checksum: 8fd73cd39ef4170e72d5c8ab9480d583583b4f85ee5be9a6ee207919ea596d84
+- filename: GCP/HA_via_api/5nic/README.md
+  checksum: 8df4ee339b60703e6bed82a8a862963dd095972e8111e060a8fc6f85d165e9a6
+- filename: GCP/HA_via_api/5nic/onboard.tpl
+  checksum: d1e8d3e01f1386cb7bcd18e0b2526d6cf39b65c66409b1ae5e6c9a7567f61751
