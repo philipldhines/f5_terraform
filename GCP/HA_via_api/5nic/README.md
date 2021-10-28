@@ -152,7 +152,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14.11 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.9 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 3.90 |
 
 ## Providers
