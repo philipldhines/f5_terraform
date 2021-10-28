@@ -20,6 +20,7 @@ repos:
         #exclude: 'path/file'
         exclude: 'Azure/HA_via_lb/as3.json'
         exclude: 'Azure/Autoscale_via_lb/as3.json'
+        exclude: 'GCP/HA_via_api/3nic/as3.json'
   - repo: https://github.com/thoughtworks/talisman
     rev: v1.9.0
     hooks:
