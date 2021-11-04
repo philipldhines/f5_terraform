@@ -105,6 +105,10 @@ variable "usecret" {
   default     = null
   description = "Used during onboarding to query the Google Cloud Secret Manager API and retrieve the admin password (use the secret name, not the secret value/password)"
 }
+variable "f5_password" {
+  description = "The admin password of the F5 Bigip that will be deployed"
+  default     = ""
+}
 variable "license1" {
   type        = string
   default     = ""

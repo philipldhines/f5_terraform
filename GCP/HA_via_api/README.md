@@ -207,6 +207,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | External subnet | `string` | `null` | no |
 | <a name="input_extVpc"></a> [extVpc](#input\_extVpc) | External VPC network | `string` | `null` | no |
 | <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
+| <a name="input_f5_password"></a> [f5\_password](#input\_f5\_password) | The admin password of the F5 Bigip that will be deployed | `string` | `""` | no |
 | <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation. Path to the public key to be used for ssh access to the VM. (ex. ~/.ssh/id\_rsa.pub) | `string` | `null` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
@@ -237,14 +238,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Description |
 |------|-------------|
-| <a name="output_f5vm01_bigip_password"></a> [f5vm01\_bigip\_password](#output\_f5vm01\_bigip\_password) | BIG-IP Password for instance 1 |
 | <a name="output_f5vm01_ext_selfip"></a> [f5vm01\_ext\_selfip](#output\_f5vm01\_ext\_selfip) | f5vm01 external self IP private address |
 | <a name="output_f5vm01_ext_selfip_pip"></a> [f5vm01\_ext\_selfip\_pip](#output\_f5vm01\_ext\_selfip\_pip) | f5vm01 external self IP public address |
 | <a name="output_f5vm01_mgmt_ip"></a> [f5vm01\_mgmt\_ip](#output\_f5vm01\_mgmt\_ip) | f5vm01 management private IP address |
 | <a name="output_f5vm01_mgmt_name"></a> [f5vm01\_mgmt\_name](#output\_f5vm01\_mgmt\_name) | f5vm01 management device name |
 | <a name="output_f5vm01_mgmt_pip"></a> [f5vm01\_mgmt\_pip](#output\_f5vm01\_mgmt\_pip) | f5vm01 management public IP address |
 | <a name="output_f5vm01_mgmt_pip_url"></a> [f5vm01\_mgmt\_pip\_url](#output\_f5vm01\_mgmt\_pip\_url) | f5vm01 management public URL |
-| <a name="output_f5vm02_bigip_password"></a> [f5vm02\_bigip\_password](#output\_f5vm02\_bigip\_password) | BIG-IP Password for instance 2 |
 | <a name="output_f5vm02_ext_selfip"></a> [f5vm02\_ext\_selfip](#output\_f5vm02\_ext\_selfip) | f5vm02 external self IP private address |
 | <a name="output_f5vm02_ext_selfip_pip"></a> [f5vm02\_ext\_selfip\_pip](#output\_f5vm02\_ext\_selfip\_pip) | f5vm02 external self IP public address |
 | <a name="output_f5vm02_mgmt_ip"></a> [f5vm02\_mgmt\_ip](#output\_f5vm02\_mgmt\_ip) | f5vm02 management private IP address |
