@@ -1,7 +1,7 @@
 # BIG-IP Environment
 uname        = "admin"
 usecret      = "my-secret"
-gceSshPubKey = "ssh-rsa xxxxx"
+gceSshPubKey = "~/.ssh/id_rsa.pub"
 prefix       = "mydemo123"
 adminSrcAddr = "0.0.0.0/0"
 mgmtVpc      = "xxxxx-net-mgmt"

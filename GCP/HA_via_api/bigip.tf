@@ -1,5 +1,7 @@
 # BIG-IP
 
+############################ Public IPs and Forwarding Rules ############################
+
 # Public IP for VIP
 resource "google_compute_address" "vip1" {
   name = "${var.prefix}-vip1"
@@ -15,15 +17,58 @@ resource "google_compute_forwarding_rule" "vip1" {
 
 resource "google_compute_target_instance" "f5vm01" {
   name     = "${var.prefix}-${var.host1_name}-ti"
-  instance = google_compute_instance.f5vm01.id
+  instance = module.f5vm01.bigip_instance_ids
 }
 
 resource "google_compute_target_instance" "f5vm02" {
   name     = "${var.prefix}-${var.host2_name}-ti"
-  instance = google_compute_instance.f5vm02.id
+  instance = module.f5vm02.bigip_instance_ids
 }
 
-# Setup Onboarding scripts
+############################ Private IPs ############################
+
+# Reserve IPs on external subnet for BIG-IP nic0s
+resource "google_compute_address" "ext" {
+  count        = var.num_instances
+  project      = var.gcp_project_id
+  name         = format("bigip-ext-%d", count.index)
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone, "/-[a-z]$/", "")
+}
+
+# Reserve VIP on external subnet for BIG-IP
+resource "google_compute_address" "vip" {
+  project      = var.gcp_project_id
+  name         = "bigip-ext-vip"
+  subnetwork   = var.extSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on management subnet for BIG-IP nic1s
+resource "google_compute_address" "mgmt" {
+  count        = var.num_instances
+  project      = var.gcp_project_id
+  name         = format("bigip-mgmt-%d", count.index)
+  subnetwork   = var.mgmtSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone, "/-[a-z]$/", "")
+}
+
+# Reserve IPs on internal subnet for BIG-IP nic2s
+resource "google_compute_address" "int" {
+  count        = var.num_instances
+  project      = var.gcp_project_id
+  name         = format("bigip-int-%d", count.index)
+  subnetwork   = var.intSubnet
+  address_type = "INTERNAL"
+  region       = replace(var.gcp_zone, "/-[a-z]$/", "")
+}
+
+
+############################ Startup Scripts ############################
+
 locals {
   vm01_onboard = templatefile("${path.module}/onboard.tpl", {
     uname          = var.uname
@@ -79,7 +124,7 @@ locals {
     admin_username     = var.uname
     host1              = "${var.prefix}-${var.host1_name}"
     host2              = "${var.prefix}-${var.host2_name}"
-    remote_host        = google_compute_instance.f5vm01.network_interface.1.network_ip
+    remote_host        = google_compute_address.mgmt[0].address
     dns_server         = var.dns_server
     dns_suffix         = var.dns_suffix
     ntp_server         = var.ntp_server
@@ -112,113 +157,141 @@ locals {
   vm02_cfe_json = templatefile("${path.module}/cfe.json", {
     f5_cloud_failover_label = var.f5_cloud_failover_label
     managed_route1          = var.managed_route1
-    remote_selfip           = google_compute_instance.f5vm01.network_interface.0.network_ip
+    remote_selfip           = google_compute_address.ext[0].address
   })
 }
 
 # Create F5 BIG-IP VMs
-resource "google_compute_instance" "f5vm01" {
-  name           = "${var.prefix}-${var.host1_name}"
-  machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
-  can_ip_forward = true
-
-  labels = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-  }
-
-  tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
-
-  boot_disk {
-    initialize_params {
-      image = var.customImage != "" ? var.customImage : var.image_name
-      size  = "128"
-    }
-  }
-
-  network_interface {
-    network    = var.extVpc
-    subnetwork = var.extSubnet
-    access_config {
-    }
-  }
-
-  network_interface {
-    network    = var.mgmtVpc
-    subnetwork = var.mgmtSubnet
-    access_config {
-    }
-  }
-
-  network_interface {
-    network    = var.intVpc
-    subnetwork = var.intSubnet
-  }
-
-  metadata = {
-    ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
-    block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
-  }
-
-  service_account {
-    email  = var.svc_acct
-    scopes = ["cloud-platform"]
-  }
+module "f5vm01" {
+  source              = "F5Networks/bigip-module/gcp"
+  prefix              = var.prefix
+  project_id          = var.gcp_project_id
+  zone                = var.gcp_zone
+  image               = var.image_name
+  service_account     = var.svc_acct
+  f5_ssh_publickey    = var.gceSshPubKey
+  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgmt[0].address }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.ext[0].address }]
+  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.int[0].address }]
+  custom_user_data    = local.vm01_onboard
 }
 
-resource "google_compute_instance" "f5vm02" {
-  name           = "${var.prefix}-${var.host2_name}"
-  machine_type   = var.bigipMachineType
-  zone           = var.gcp_zone
-  can_ip_forward = true
-
-  labels = {
-    f5_cloud_failover_label = var.f5_cloud_failover_label
-  }
-
-  tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
-
-  boot_disk {
-    initialize_params {
-      image = var.customImage != "" ? var.customImage : var.image_name
-      size  = "128"
-    }
-  }
-
-  network_interface {
-    network    = var.extVpc
-    subnetwork = var.extSubnet
-    access_config {
-    }
-    alias_ip_range {
-      ip_cidr_range = var.alias_ip_range
-    }
-  }
-
-  network_interface {
-    network    = var.mgmtVpc
-    subnetwork = var.mgmtSubnet
-    access_config {
-    }
-  }
-
-  network_interface {
-    network    = var.intVpc
-    subnetwork = var.intSubnet
-  }
-
-  metadata = {
-    ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
-    block-project-ssh-keys = true
-    startup-script         = var.customImage != "" ? var.customUserData : local.vm02_onboard
-  }
-
-  service_account {
-    email  = var.svc_acct
-    scopes = ["cloud-platform"]
-  }
+module "f5vm02" {
+  source              = "F5Networks/bigip-module/gcp"
+  prefix              = var.prefix
+  project_id          = var.gcp_project_id
+  zone                = var.gcp_zone
+  image               = var.image_name
+  service_account     = var.svc_acct
+  f5_ssh_publickey    = var.gceSshPubKey
+  mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgmt[1].address }]
+  external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.ext[1].address }]
+  internal_subnet_ids = [{ "subnet_id" = var.intSubnet, "public_ip" = false, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.int[1].address }]
+  custom_user_data    = local.vm02_onboard
 }
+
+# resource "google_compute_instance" "f5vm01" {
+#   name           = "${var.prefix}-${var.host1_name}"
+#   machine_type   = var.bigipMachineType
+#   zone           = var.gcp_zone
+#   can_ip_forward = true
+
+#   labels = {
+#     f5_cloud_failover_label = var.f5_cloud_failover_label
+#   }
+
+#   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
+
+#   boot_disk {
+#     initialize_params {
+#       image = var.customImage != "" ? var.customImage : var.image_name
+#       size  = "128"
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.extVpc
+#     subnetwork = var.extSubnet
+#     access_config {
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.mgmtVpc
+#     subnetwork = var.mgmtSubnet
+#     access_config {
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.intVpc
+#     subnetwork = var.intSubnet
+#   }
+
+#   metadata = {
+#     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
+#     block-project-ssh-keys = true
+#     startup-script         = var.customImage != "" ? var.customUserData : local.vm01_onboard
+#   }
+
+#   service_account {
+#     email  = var.svc_acct
+#     scopes = ["cloud-platform"]
+#   }
+# }
+
+# resource "google_compute_instance" "f5vm02" {
+#   name           = "${var.prefix}-${var.host2_name}"
+#   machine_type   = var.bigipMachineType
+#   zone           = var.gcp_zone
+#   can_ip_forward = true
+
+#   labels = {
+#     f5_cloud_failover_label = var.f5_cloud_failover_label
+#   }
+
+#   tags = ["appfw-${var.prefix}", "mgmtfw-${var.prefix}"]
+
+#   boot_disk {
+#     initialize_params {
+#       image = var.customImage != "" ? var.customImage : var.image_name
+#       size  = "128"
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.extVpc
+#     subnetwork = var.extSubnet
+#     access_config {
+#     }
+#     alias_ip_range {
+#       ip_cidr_range = var.alias_ip_range
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.mgmtVpc
+#     subnetwork = var.mgmtSubnet
+#     access_config {
+#     }
+#   }
+
+#   network_interface {
+#     network    = var.intVpc
+#     subnetwork = var.intSubnet
+#   }
+
+#   metadata = {
+#     ssh-keys               = "${var.uname}:${var.gceSshPubKey}"
+#     block-project-ssh-keys = true
+#     startup-script         = var.customImage != "" ? var.customUserData : local.vm02_onboard
+#   }
+
+#   service_account {
+#     email  = var.svc_acct
+#     scopes = ["cloud-platform"]
+#   }
+# }
 
 # # Troubleshooting - create local output files
 # resource "local_file" "onboard_file" {

@@ -152,27 +152,32 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 0.14 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 3 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.14 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 3.90 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 3.86.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 3.90.1 |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_f5vm01"></a> [f5vm01](#module\_f5vm01) | F5Networks/bigip-module/gcp | n/a |
+| <a name="module_f5vm02"></a> [f5vm02](#module\_f5vm02) | F5Networks/bigip-module/gcp | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
+| [google_compute_address.ext](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.int](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.mgmt](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
+| [google_compute_address.vip](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_address.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_address) | resource |
 | [google_compute_forwarding_rule.vip1](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_forwarding_rule) | resource |
-| [google_compute_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
-| [google_compute_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance) | resource |
 | [google_compute_target_instance.f5vm01](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_instance) | resource |
 | [google_compute_target_instance.f5vm02](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_target_instance) | resource |
 
@@ -202,7 +207,7 @@ No modules.
 | <a name="input_extSubnet"></a> [extSubnet](#input\_extSubnet) | External subnet | `string` | `null` | no |
 | <a name="input_extVpc"></a> [extVpc](#input\_extVpc) | External VPC network | `string` | `null` | no |
 | <a name="input_f5_cloud_failover_label"></a> [f5\_cloud\_failover\_label](#input\_f5\_cloud\_failover\_label) | This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event. | `string` | `"mydeployment"` | no |
-| <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation | `string` | `null` | no |
+| <a name="input_gceSshPubKey"></a> [gceSshPubKey](#input\_gceSshPubKey) | SSH public key for admin authentation. Path to the public key to be used for ssh access to the VM. (ex. ~/.ssh/id\_rsa.pub) | `string` | `null` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | GCP Project ID for provider | `string` | `null` | no |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | GCP Region for provider | `string` | `"us-west1"` | no |
 | <a name="input_gcp_zone"></a> [gcp\_zone](#input\_gcp\_zone) | GCP Zone for provider | `string` | `"us-west1-b"` | no |
@@ -218,6 +223,7 @@ No modules.
 | <a name="input_mgmtSubnet"></a> [mgmtSubnet](#input\_mgmtSubnet) | Management subnet | `string` | `null` | no |
 | <a name="input_mgmtVpc"></a> [mgmtVpc](#input\_mgmtVpc) | Management VPC network | `string` | `null` | no |
 | <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | Leave the default NTP server the BIG-IP uses, or replace the default NTP server with the one you want to use | `string` | `"0.us.pool.ntp.org"` | no |
+| <a name="input_num_instances"></a> [num\_instances](#input\_num\_instances) | The number of BIG-IP instances to create. Default is 2. | `number` | `2` | no |
 | <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | This is where the onboarding script logs all the events | `string` | `"/var/log/cloud/onboard.log"` | no |
 | <a name="input_owner"></a> [owner](#input\_owner) | This is a tag used for object creation. Example is last name. | `string` | `null` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | This value is inserted at the beginning of each Google object (alpha-numeric, no special character) | `string` | `"demo"` | no |
@@ -257,7 +263,7 @@ To run this Terraform template, perform the following steps:
       # BIG-IP Environment
       uname        = "admin"
       usecret      = "my-secret"
-      gceSshPubKey = "ssh-rsa xxxxx
+      gceSshPubKey = "~/.ssh/id_rsa.pub"
       prefix       = "mydemo123"
       adminSrcAddr = "0.0.0.0/0"
       mgmtVpc      = "xxxxx-net-mgmt"
@@ -328,8 +334,8 @@ This example illustrates how to replace or upgrade the BIG-IP VE.
   2. Revoke the problematic BIG-IP VE's license (if BYOL)
   3. Run command
 ```
-terraform taint google_compute_instance.f5vm01
-terraform taint google_compute_instance.f5vm02
+terraform taint module.f5vm01.google_compute_instance.f5vm01
+terraform taint module.f5vm02.google_compute_instance.f5vm01
 terraform taint google_compute_target_instance.f5vm01
 terraform taint google_compute_target_instance.f5vm02
 terraform taint google_compute_forwarding_rule.vip1

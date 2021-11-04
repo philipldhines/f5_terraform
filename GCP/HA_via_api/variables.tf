@@ -123,7 +123,7 @@ variable "adminSrcAddr" {
 variable "gceSshPubKey" {
   type        = string
   default     = null
-  description = "SSH public key for admin authentation"
+  description = "SSH public key for admin authentation. Path to the public key to be used for ssh access to the VM. (ex. ~/.ssh/id_rsa.pub)"
 }
 variable "host1_name" {
   type        = string
@@ -229,4 +229,9 @@ variable "f5_cloud_failover_label" {
   type        = string
   default     = "mydeployment"
   description = "This is a tag used for F5 Cloud Failover Extension to identity which cloud objects to move during a failover event."
+}
+variable "num_instances" {
+  type        = number
+  default     = 2
+  description = "The number of BIG-IP instances to create. Default is 2."
 }
