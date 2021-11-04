@@ -24,6 +24,10 @@ output "f5vm01_mgmt_name" {
   description = "f5vm01 management device name"
   value       = module.f5vm01.name
 }
+output "f5vm01_bigip_password" {
+  description = "BIG-IP Password for instance 1"
+  value       = module.f5vm01.bigip_password
+}
 output "f5vm02_ext_selfip" {
   description = "f5vm02 external self IP private address"
   value       = google_compute_address.ext[1].address
@@ -55,4 +59,8 @@ output "public_vip" {
 output "public_vip_url" {
   description = "public URL for application"
   value       = "https://${google_compute_forwarding_rule.vip1.ip_address}"
+}
+output "f5vm02_bigip_password" {
+  description = "BIG-IP Password for instance 2"
+  value       = module.f5vm02.bigip_password
 }

@@ -6,7 +6,7 @@ fileignoreconfig:
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: ccc1dd51e406ddeedb8ec9e649f03225456e1132601d39c17346221cd6702901
 - filename: GCP/HA_via_api/README.md
-  checksum: 3809b43ddd591b022995420ec75aec98ea379d4f71b1ee779df7901e80a34d8c
+  checksum: 78f298c1054eef5d5521f837131ad19c8ffd8d504f415e07ccac33aff738da33
 - filename: GCP/HA_via_api/bigip.tf
   checksum: 6b7ea346fe921c248eb1c7c6ededb79b1d1471574a2363fe2409c4f667703c22
 - filename: GCP/Autoscale_via_lb/1nic/README.md

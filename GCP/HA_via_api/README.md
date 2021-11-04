@@ -237,12 +237,14 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Description |
 |------|-------------|
+| <a name="output_f5vm01_bigip_password"></a> [f5vm01\_bigip\_password](#output\_f5vm01\_bigip\_password) | BIG-IP Password for instance 1 |
 | <a name="output_f5vm01_ext_selfip"></a> [f5vm01\_ext\_selfip](#output\_f5vm01\_ext\_selfip) | f5vm01 external self IP private address |
 | <a name="output_f5vm01_ext_selfip_pip"></a> [f5vm01\_ext\_selfip\_pip](#output\_f5vm01\_ext\_selfip\_pip) | f5vm01 external self IP public address |
 | <a name="output_f5vm01_mgmt_ip"></a> [f5vm01\_mgmt\_ip](#output\_f5vm01\_mgmt\_ip) | f5vm01 management private IP address |
 | <a name="output_f5vm01_mgmt_name"></a> [f5vm01\_mgmt\_name](#output\_f5vm01\_mgmt\_name) | f5vm01 management device name |
 | <a name="output_f5vm01_mgmt_pip"></a> [f5vm01\_mgmt\_pip](#output\_f5vm01\_mgmt\_pip) | f5vm01 management public IP address |
 | <a name="output_f5vm01_mgmt_pip_url"></a> [f5vm01\_mgmt\_pip\_url](#output\_f5vm01\_mgmt\_pip\_url) | f5vm01 management public URL |
+| <a name="output_f5vm02_bigip_password"></a> [f5vm02\_bigip\_password](#output\_f5vm02\_bigip\_password) | BIG-IP Password for instance 2 |
 | <a name="output_f5vm02_ext_selfip"></a> [f5vm02\_ext\_selfip](#output\_f5vm02\_ext\_selfip) | f5vm02 external self IP private address |
 | <a name="output_f5vm02_ext_selfip_pip"></a> [f5vm02\_ext\_selfip\_pip](#output\_f5vm02\_ext\_selfip\_pip) | f5vm02 external self IP public address |
 | <a name="output_f5vm02_mgmt_ip"></a> [f5vm02\_mgmt\_ip](#output\_f5vm02\_mgmt\_ip) | f5vm02 management private IP address |

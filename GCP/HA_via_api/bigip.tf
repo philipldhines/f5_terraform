@@ -169,6 +169,7 @@ module "f5vm01" {
   zone                = var.gcp_zone
   image               = var.image_name
   service_account     = var.svc_acct
+  f5_username         = var.uname
   f5_ssh_publickey    = var.gceSshPubKey
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgmt[0].address }]
   external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.ext[0].address }]
@@ -183,6 +184,7 @@ module "f5vm02" {
   zone                = var.gcp_zone
   image               = var.image_name
   service_account     = var.svc_acct
+  f5_username         = var.uname
   f5_ssh_publickey    = var.gceSshPubKey
   mgmt_subnet_ids     = [{ "subnet_id" = var.mgmtSubnet, "public_ip" = true, "private_ip_primary" = google_compute_address.mgmt[1].address }]
   external_subnet_ids = [{ "subnet_id" = var.extSubnet, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = google_compute_address.ext[1].address }]
