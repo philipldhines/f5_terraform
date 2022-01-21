@@ -1,5 +1,15 @@
 # BIG-IP
 
+############################ Password ############################
+
+resource "random_string" "password" {
+  length      = 16
+  min_upper   = 1
+  min_lower   = 1
+  min_numeric = 1
+  special     = false
+}
+
 ############################ Public IPs and Forwarding Rules ############################
 
 # Public IP for VIP
@@ -70,35 +80,69 @@ resource "google_compute_address" "int" {
 ############################ Startup Scripts ############################
 
 locals {
-  vm01_onboard = templatefile("${path.module}/onboard.tpl", {
-    uname          = var.uname
-    usecret        = var.usecret
-    ksecret        = var.ksecret
-    gcp_project_id = var.gcp_project_id
-    DO_URL         = var.DO_URL
-    AS3_URL        = var.AS3_URL
-    TS_URL         = var.TS_URL
-    CFE_URL        = var.CFE_URL
-    onboard_log    = var.onboard_log
-    DO_Document    = local.vm01_do_json
-    AS3_Document   = ""
-    TS_Document    = local.ts_json
-    CFE_Document   = local.vm01_cfe_json
+  vm01_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
+    uname                             = var.uname
+    usecret                           = var.usecret
+    ssh_keypair                       = var.gceSshPubKey
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    bigip_password                    = (var.f5_password == "") ? (var.gcp_secret_manager_authentication ? var.gcp_secret_name : random_string.password.result) : var.f5_password
+    ksecret                           = var.ksecret
+    gcp_project_id                    = var.gcp_project_id
+    DO_URL                            = var.DO_URL
+    AS3_URL                           = var.AS3_URL
+    TS_URL                            = var.TS_URL
+    CFE_URL                           = var.CFE_URL
+    INIT_URL                          = var.INIT_URL
+    DO_VER                            = split("/", var.DO_URL)[7]
+    AS3_VER                           = split("/", var.AS3_URL)[7]
+    TS_VER                            = split("/", var.TS_URL)[7]
+    CFE_VER                           = split("/", var.CFE_URL)[7]
+    onboard_log                       = var.onboard_log
+    f5_cloud_failover_label           = format("%s-%s", var.prefix)
+    cfe_managed_route                 = var.managed_route1
+    remote_selfip_ext                 = google_compute_address.ext[1].address
+    host1                             = "${var.prefix}-${var.host1_name}"
+    host2                             = "${var.prefix}-${var.host2_name}"
+    remote_host                       = "${var.prefix}-${var.host2_name}"
+    dns_server                        = var.dns_server
+    ntp_server                        = var.ntp_server
+    timezone                          = var.timezone
+    publicvip                         = google_compute_address.vip1.address
+    privatevip                        = var.alias_ip_range
+    NIC_COUNT                         = true
   })
-  vm02_onboard = templatefile("${path.module}/onboard.tpl", {
-    uname          = var.uname
-    usecret        = var.usecret
-    ksecret        = var.ksecret
-    gcp_project_id = var.gcp_project_id
-    DO_URL         = var.DO_URL
-    AS3_URL        = var.AS3_URL
-    TS_URL         = var.TS_URL
-    CFE_URL        = var.CFE_URL
-    onboard_log    = var.onboard_log
-    DO_Document    = local.vm02_do_json
-    AS3_Document   = local.as3_json
-    TS_Document    = local.ts_json
-    CFE_Document   = local.vm02_cfe_json
+  vm02_onboard = templatefile("${path.module}/f5_onboard.tmpl", {
+    uname                             = var.uname
+    usecret                           = var.usecret
+    ssh_keypair                       = var.gceSshPubKey
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    gcp_secret_manager_authentication = var.gcp_secret_manager_authentication
+    bigip_password                    = (var.f5_password == "") ? (var.gcp_secret_manager_authentication ? var.gcp_secret_name : random_string.password.result) : var.f5_password
+    ksecret                           = var.ksecret
+    gcp_project_id                    = var.gcp_project_id
+    DO_URL                            = var.DO_URL
+    AS3_URL                           = var.AS3_URL
+    TS_URL                            = var.TS_URL
+    CFE_URL                           = var.CFE_URL
+    INIT_URL                          = var.INIT_URL
+    DO_VER                            = split("/", var.DO_URL)[7]
+    AS3_VER                           = split("/", var.AS3_URL)[7]
+    TS_VER                            = split("/", var.TS_URL)[7]
+    CFE_VER                           = split("/", var.CFE_URL)[7]
+    onboard_log                       = var.onboard_log
+    f5_cloud_failover_label           = format("%s-%s", var.prefix)
+    cfe_managed_route                 = var.managed_route1
+    remote_selfip_ext                 = google_compute_address.ext[1].address
+    host1                             = "${var.prefix}-${var.host1_name}"
+    host2                             = "${var.prefix}-${var.host2_name}"
+    remote_host                       = google_compute_address.mgmt[0].address
+    dns_server                        = var.dns_server
+    ntp_server                        = var.ntp_server
+    timezone                          = var.timezone
+    publicvip                         = google_compute_address.vip1.address
+    privatevip                        = var.alias_ip_range
+    NIC_COUNT                         = true
   })
   vm01_do_json = templatefile("${path.module}/do.json", {
     regKey             = var.license1
@@ -160,6 +204,8 @@ locals {
     remote_selfip           = google_compute_address.ext[0].address
   })
 }
+
+############################ Compute ############################
 
 # Create F5 BIG-IP VMs
 module "f5vm01" {

@@ -179,6 +179,11 @@ variable "CFE_URL" {
   type        = string
   default     = "https://github.com/F5Networks/f5-cloud-failover-extension/releases/download/v1.9.0/f5-cloud-failover-1.9.0-0.noarch.rpm"
 }
+variable "INIT_URL" {
+  description = "URL to download the BIG-IP runtime init"
+  type        = string
+  default     = "https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.3.2/dist/f5-bigip-runtime-init-1.3.2-1.gz.run"
+}
 variable "onboard_log" {
   type        = string
   default     = "/var/log/cloud/onboard.log"
@@ -238,4 +243,14 @@ variable "num_instances" {
   type        = number
   default     = 2
   description = "The number of BIG-IP instances to create. Default is 2."
+}
+variable "gcp_secret_manager_authentication" {
+  description = "Whether to use secret manager to pass authentication"
+  type        = bool
+  default     = false
+}
+variable "gcp_secret_name" {
+  description = "The secret to get the secret version for"
+  type        = string
+  default     = ""
 }

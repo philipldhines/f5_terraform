@@ -5,10 +5,12 @@ fileignoreconfig:
   checksum: 54596a5d3b1797663fe99c9a0081cf4e004163fd5987358b91d5e9ddb95a533a
 - filename: GCP/HA_via_api/terraform.tfvars.example
   checksum: ccc1dd51e406ddeedb8ec9e649f03225456e1132601d39c17346221cd6702901
-- filename: GCP/HA_via_api/README.md
-  checksum: 907ae917e13dab88c96f264cca05297ab903ac3c3c265d0893e909cb76e061c7
 - filename: GCP/HA_via_api/bigip.tf
-  checksum: 6b7ea346fe921c248eb1c7c6ededb79b1d1471574a2363fe2409c4f667703c22
+  checksum: a3532409115834a1442929a2b1ed2ce4185ae75805af030f631c67dd43398185
+- filename: GCP/HA_via_api/f5_onboard.tmpl
+  checksum: a8002659546a52c831c84858f396f6ea9b89c50bd4e3e913fb1bd86c703b1098
+- filename: GCP/HA_via_api/README.md
+  checksum: 6e1a84f9d49f8371be3ed82a57aa4e724f3330422feaff5895b980e877847323
 - filename: GCP/Autoscale_via_lb/1nic/README.md
   checksum: a21478ef4050249abb98b7bd71f7f8b25647f736fbe0e900e959c5025731bbb1
 - filename: GCP/Autoscale_via_lb/3nic/README.md
