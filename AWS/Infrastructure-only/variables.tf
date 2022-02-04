@@ -15,3 +15,18 @@ variable "resourceOwner" {
   description = "owner of the deployment, for tagging purposes"
   default     = "myName"
 }
+variable "awsAz1" {
+  description = "Availability zone, will dynamically choose one if left empty"
+  type        = string
+  default     = null
+}
+variable "awsAz2" {
+  description = "Availability zone, will dynamically choose one if left empty"
+  type        = string
+  default     = null
+}
+variable "awsAz3" {
+  description = "Availability zone, will dynamically choose one if left empty"
+  type        = string
+  default     = null
+}
