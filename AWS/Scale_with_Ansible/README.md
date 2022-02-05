@@ -106,9 +106,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_bigipAZ1"></a> [bigipAZ1](#module\_bigipAZ1) | F5Networks/bigip-module/aws | n/a |
-| <a name="module_bigipAZ2"></a> [bigipAZ2](#module\_bigipAZ2) | F5Networks/bigip-module/aws | n/a |
-| <a name="module_bigipAZ3"></a> [bigipAZ3](#module\_bigipAZ3) | F5Networks/bigip-module/aws | n/a |
+| <a name="module_bigip"></a> [bigip](#module\_bigip) | F5Networks/bigip-module/aws | n/a |
 
 ## Resources
 
@@ -162,7 +160,7 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 | <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | Directory on the BIG-IP to store the cloud-init logs | `string` | `"/var/log/cloud/startup-script.log"` | no |
 | <a name="input_projectPrefix"></a> [projectPrefix](#input\_projectPrefix) | prefix for resources | `string` | `"myDemo"` | no |
 | <a name="input_resourceOwner"></a> [resourceOwner](#input\_resourceOwner) | owner of the deployment, for tagging purposes | `string` | `"myName"` | no |
-| <a name="input_sleep_timer"></a> [sleep\_timer](#input\_sleep\_timer) | The number of seconds/minutes of delay to build into creation of BIG-IP VMs; default is 250. BIG-IP requires a few minutes to complete the onboarding process and this value can be used to delay the processing of dependent Terraform resources. | `string` | `"250s"` | no |
+| <a name="input_sleep_time"></a> [sleep\_time](#input\_sleep\_time) | The number of seconds/minutes of delay to build into creation of BIG-IP VMs; default is 250. BIG-IP requires a few minutes to complete the onboarding process and this value can be used to delay the processing of dependent Terraform resources. | `string` | `"250s"` | no |
 | <a name="input_timezone"></a> [timezone](#input\_timezone) | If you would like to change the time zone the BIG-IP uses, enter the time zone you want to use. This is based on the tz database found in /usr/share/zoneinfo (see the full list [here](https://github.com/F5Networks/f5-azure-arm-templates/blob/master/azure-timezone-list.md)). Example values: UTC, US/Pacific, US/Eastern, Europe/London or Asia/Singapore. | `string` | `"UTC"` | no |
 | <a name="input_vpcId"></a> [vpcId](#input\_vpcId) | The AWS network VPC ID | `string` | `null` | no |
 

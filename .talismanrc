@@ -40,7 +40,7 @@ fileignoreconfig:
 - filename: AWS/Scale_with_Ansible/terraform.tfvars.example
   checksum: 73adc20080914ed864e4fa3945c056d162ae5ef4b0e562136e8d3689d974e291
 - filename: AWS/Scale_with_Ansible/bigip.tf
-  checksum: fbadbceeabe3417e02438326bfd9a6d5ed60085a3e607bef9456162571abea8d
+  checksum: 0c08bb6ed051829c3be1d3a2773fd54fb90e6530a92420a313ae36ecaaa9e193
 - filename: AWS/Scale_with_Ansible/f5_onboard.tmpl
   checksum: a13f2fcc257a074f5c57643a249a07a3b42ad2c5ee0e9bfdeb66646ac34bf43f
 - filename: AWS/Scale_with_Ansible/README.md

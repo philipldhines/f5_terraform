@@ -55,42 +55,77 @@ locals {
 
 ############################ Compute ############################
 
+locals {
+  bigips = {
+    az1 = {
+      mgmtSubnetId = { "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }
+      extSubnetId  = { "subnet_id" = var.extSubnetAz1, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }
+      intSubnetId  = { "subnet_id" = var.intSubnetAz1, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }
+    }
+    az2 = {
+      mgmtSubnetId = { "subnet_id" = var.mgmtSubnetAz2, "public_ip" = true, "private_ip_primary" = "" }
+      extSubnetId  = { "subnet_id" = var.extSubnetAz2, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }
+      intSubnetId  = { "subnet_id" = var.intSubnetAz2, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }
+    }
+    az3 = {
+      mgmtSubnetId = { "subnet_id" = var.mgmtSubnetAz3, "public_ip" = true, "private_ip_primary" = "" }
+      extSubnetId  = { "subnet_id" = var.extSubnetAz3, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }
+      intSubnetId  = { "subnet_id" = var.intSubnetAz3, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }
+    }
+  }
+}
+
 # Create F5 BIG-IP VMs
-module "bigipAZ1" {
+module "bigip" {
+  for_each                   = local.bigips
   source                     = "F5Networks/bigip-module/aws"
   prefix                     = var.projectPrefix
   ec2_key_name               = aws_key_pair.bigip.key_name
-  mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }]
-  external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz1, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
-  internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz1, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
+  mgmt_subnet_ids            = [each.value["mgmtSubnetId"]]
+  external_subnet_ids        = [each.value["extSubnetId"]]
+  internal_subnet_ids        = [each.value["intSubnetId"]]
   mgmt_securitygroup_ids     = [var.mgmtNsg]
   external_securitygroup_ids = [var.extNsg]
   internal_securitygroup_ids = [var.intNsg]
+  sleep_time                 = var.sleep_time
   custom_user_data           = base64encode(local.f5_onboard)
 }
 
-module "bigipAZ2" {
-  source                     = "F5Networks/bigip-module/aws"
-  prefix                     = var.projectPrefix
-  ec2_key_name               = aws_key_pair.bigip.key_name
-  mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz2, "public_ip" = true, "private_ip_primary" = "" }]
-  external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz2, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
-  internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz2, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
-  mgmt_securitygroup_ids     = [var.mgmtNsg]
-  external_securitygroup_ids = [var.extNsg]
-  internal_securitygroup_ids = [var.intNsg]
-  custom_user_data           = base64encode(local.f5_onboard)
-}
+# module "bigipAZ1" {
+#   source                     = "F5Networks/bigip-module/aws"
+#   prefix                     = var.projectPrefix
+#   ec2_key_name               = aws_key_pair.bigip.key_name
+#   mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz1, "public_ip" = true, "private_ip_primary" = "" }]
+#   external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz1, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+#   internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz1, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
+#   mgmt_securitygroup_ids     = [var.mgmtNsg]
+#   external_securitygroup_ids = [var.extNsg]
+#   internal_securitygroup_ids = [var.intNsg]
+#   custom_user_data           = base64encode(local.f5_onboard)
+# }
 
-module "bigipAZ3" {
-  source                     = "F5Networks/bigip-module/aws"
-  prefix                     = var.projectPrefix
-  ec2_key_name               = aws_key_pair.bigip.key_name
-  mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz3, "public_ip" = true, "private_ip_primary" = "" }]
-  external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz3, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
-  internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz3, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
-  mgmt_securitygroup_ids     = [var.mgmtNsg]
-  external_securitygroup_ids = [var.extNsg]
-  internal_securitygroup_ids = [var.intNsg]
-  custom_user_data           = base64encode(local.f5_onboard)
-}
+# module "bigipAZ2" {
+#   source                     = "F5Networks/bigip-module/aws"
+#   prefix                     = var.projectPrefix
+#   ec2_key_name               = aws_key_pair.bigip.key_name
+#   mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz2, "public_ip" = true, "private_ip_primary" = "" }]
+#   external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz2, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+#   internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz2, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
+#   mgmt_securitygroup_ids     = [var.mgmtNsg]
+#   external_securitygroup_ids = [var.extNsg]
+#   internal_securitygroup_ids = [var.intNsg]
+#   custom_user_data           = base64encode(local.f5_onboard)
+# }
+
+# module "bigipAZ3" {
+#   source                     = "F5Networks/bigip-module/aws"
+#   prefix                     = var.projectPrefix
+#   ec2_key_name               = aws_key_pair.bigip.key_name
+#   mgmt_subnet_ids            = [{ "subnet_id" = var.mgmtSubnetAz3, "public_ip" = true, "private_ip_primary" = "" }]
+#   external_subnet_ids        = [{ "subnet_id" = var.extSubnetAz3, "public_ip" = true, "private_ip_primary" = "", "private_ip_secondary" = "" }]
+#   internal_subnet_ids        = [{ "subnet_id" = var.intSubnetAz3, "public_ip" = true, "public_ip" = false, "private_ip_primary" = "" }]
+#   mgmt_securitygroup_ids     = [var.mgmtNsg]
+#   external_securitygroup_ids = [var.extNsg]
+#   internal_securitygroup_ids = [var.intNsg]
+#   custom_user_data           = base64encode(local.f5_onboard)
+# }
