@@ -79,7 +79,7 @@ locals {
 module "bigip" {
   for_each                   = local.bigips
   source                     = "F5Networks/bigip-module/aws"
-  prefix                     = var.projectPrefix
+  prefix                     = format("%s-%s", var.projectPrefix, each.key)
   ec2_key_name               = aws_key_pair.bigip.key_name
   mgmt_subnet_ids            = [each.value["mgmtSubnetId"]]
   external_subnet_ids        = [each.value["extSubnetId"]]

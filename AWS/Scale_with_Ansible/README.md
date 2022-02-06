@@ -168,9 +168,12 @@ This template uses PayGo BIG-IP image for the deployment (as default). If you wo
 
 | Name | Description |
 |------|-------------|
-| <a name="output_bigipAZ1_mgmtIP_public"></a> [bigipAZ1\_mgmtIP\_public](#output\_bigipAZ1\_mgmtIP\_public) | BIG-IP AZ1 management public IP address |
-| <a name="output_bigipAZ2_mgmtIP_public"></a> [bigipAZ2\_mgmtIP\_public](#output\_bigipAZ2\_mgmtIP\_public) | BIG-IP AZ2 management public IP address |
-| <a name="output_bigipAZ3_mgmtIP_public"></a> [bigipAZ3\_mgmtIP\_public](#output\_bigipAZ3\_mgmtIP\_public) | BIG-IP AZ3 management public IP address |
+| <a name="output_bigip_AZ1_mgmtIP"></a> [bigip\_AZ1\_mgmtIP](#output\_bigip\_AZ1\_mgmtIP) | BIG-IP AZ1 management public IP address |
+| <a name="output_bigip_AZ2_mgmtIP"></a> [bigip\_AZ2\_mgmtIP](#output\_bigip\_AZ2\_mgmtIP) | BIG-IP AZ2 management public IP address |
+| <a name="output_bigip_AZ3_mgmtIP"></a> [bigip\_AZ3\_mgmtIP](#output\_bigip\_AZ3\_mgmtIP) | BIG-IP AZ3 management public IP address |
+| <a name="output_vip_AZ1"></a> [vip\_AZ1](#output\_vip\_AZ1) | VIP Listener on BIG-IP AZ1 |
+| <a name="output_vip_AZ2"></a> [vip\_AZ2](#output\_vip\_AZ2) | VIP Listener on BIG-IP AZ1 |
+| <a name="output_vip_AZ3"></a> [vip\_AZ3](#output\_vip\_AZ3) | VIP Listener on BIG-IP AZ1 |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 <!-- markdownlint-enable no-inline-html -->
 
@@ -238,6 +241,10 @@ TODO
 In order to pass traffic from your clients to the servers through the BIG-IP system, you must create a virtual server on each BIG-IP VE. This demo creates a demo virtual server using Ansible to configure all BIG-IP devices with identical application services. See xyz...PENDING TBD.
 
 ## Troubleshooting
+
+### Device Logs
+Access the BIG-IP device via SSH and review the startup-script.log file for errors.
+- /var/log/cloud/startup-script.log
 
 ### F5 Automation Toolchain Components
 F5 BIG-IP Runtime Init uses the F5 Automation Toolchain for configuration of BIG-IP instances.  Any errors thrown from these components will be surfaced in the bigIpRuntimeInit.log (or a custom log location as specified below).
