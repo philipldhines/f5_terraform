@@ -228,7 +228,7 @@ To run this Terraform template, perform the following steps:
 
 The following is an example configuration diagram for this solution deployment. In this scenario, all access to the BIG-IP VE devices is direct to each BIG-IP via the management interface. The IP addresses in this example may be different in your implementation.
 
-![Configuration Example TBD](./images/aws-standalone-example.png)
+![Configuration Example](./images/aws-3az-bigip-scale.png)
 
 ## Documentation
 
