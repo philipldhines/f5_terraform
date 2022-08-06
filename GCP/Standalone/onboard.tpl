@@ -4,17 +4,36 @@ source /usr/lib/bigstart/bigip-ready-functions
 # BIG-IP ONBOARD SCRIPT
 
 mkdir -p /config/cloud
-mkdir -p /var/log/cloud
+#mkdir -p /var/log/cloud
 
 LOG_FILE=${onboard_log}
 
-# If file exists, exit as we only want to run once
-if [ ! -e $LOG_FILE ]; then
-  touch $LOG_FILE
-  exec &>>$LOG_FILE
-else
+
+# Setup console and startup-script logging
+#LOG_FILE=/var/log/cloud/startup-script.log
+mkdir -p  /var/log/cloud
+[[ -f $LOG_FILE ]] || /usr/bin/touch $LOG_FILE
+npipe=/tmp/$$.tmp
+trap "rm -f $npipe" EXIT
+mknod $npipe p
+tee <$npipe -a $LOG_FILE /dev/ttyS0 &
+exec 1>&-
+exec 1>$npipe
+exec 2>&1
+
+# skip startup script if already complete
+if [[ -f /config/startupFinished ]]; then
+  echo "Onboarding complete, skip startup script"
   exit
 fi
+
+## If file exists, exit as we only want to run once
+#if [ ! -e $LOG_FILE ]; then
+#  touch $LOG_FILE
+#  exec &>>$LOG_FILE
+#else
+#  exit
+#fi
 
 date
 echo "Starting onboard script"
@@ -225,7 +244,7 @@ date
 waitNetwork
 echo "Retrieving BIG-IP password from Metadata secret"
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+passwd=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/latest:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 
 date
 
@@ -375,11 +394,16 @@ waitNetwork
 
 # BIG-IP Credentials
 svcacct_token=$(curl -s -f --retry 20 "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" -H "Metadata-Flavor: Google" | jq -r ".access_token")
-admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/1:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
+echo "Service Token: $${svcacct_token}"
+
+admin_password=$(curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/latest:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode)
 CREDS="admin:"$admin_password
+
+curl -s -f --retry 20 "https://secretmanager.googleapis.com/v1/projects/$projectId/secrets/$usecret/versions/latest:access" -H "Authorization: Bearer $svcacct_token" | jq -r ".payload.data" | base64 --decode
 
 # Create admin account and password
 echo "Updating admin account"
+
 if [[ $admin_username != "admin" ]]; then
   tmsh create auth user $admin_username password "$admin_password" shell bash partition-access add { all-partitions { role admin } };
 else
@@ -387,9 +411,11 @@ else
 fi
 
 # Copy SSH key
-echo "Copying SSH key"
-mkdir -p /home/$admin_username/.ssh/
-cp /home/admin/.ssh/authorized_keys /home/$admin_username/.ssh/authorized_keys
+if [[ $admin_username != "admin" ]]; then
+  echo "Copying SSH key"
+  mkdir -p /home/$admin_username/.ssh/
+  cp /home/admin/.ssh/authorized_keys /home/$admin_username/.ssh/authorized_keys
+fi
 echo "Admin account updated"
 
 #########################
