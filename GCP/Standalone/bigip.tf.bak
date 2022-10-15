@@ -114,10 +114,3 @@ module "bigip" {
   custom_user_data    = local.f5_onboard1
   sleep_time          = "30s"
 }
-
-
-# Troubleshooting - create local output files
-resource "local_file" "onboard_file" {
-  content  = local.f5_onboard1
-  filename = "${path.module}/f5_onboard1.tpl_data.json"
-}

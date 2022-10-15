@@ -1,10 +1,5 @@
 # Variables
 
-variable "availability_zones" {
-  description = "List of Availability Zones"
-  type        = list(string)
-}
-
 variable "svc_acct" {
   type        = string
   default     = null
@@ -97,7 +92,7 @@ variable "f5_username" {
 }
 variable "f5_password" {
   type        = string
-  default     = ""
+  default     = null
   description = "Password for the Virtual Machine"
 }
 variable "gcp_secret_manager_authentication" {
